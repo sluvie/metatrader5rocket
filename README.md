@@ -19,6 +19,7 @@ $ pip install -r requirements.txt
 Tickers:
 ```python
 import metatrader.mt5 as mt5
+import os
 
 # start the engine
 if __name__ == '__main__':
