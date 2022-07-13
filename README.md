@@ -10,6 +10,10 @@ currently works with Python >= 3.6
 ## Feature
 
 At the momment, metatrader5rocket supports:
+- Tickers
+- Orders
+- Close Position
+- Simple Bot
 
 ## Installation
 
