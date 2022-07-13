@@ -3,6 +3,10 @@ Metatrader 5 Libraries Python
 
 ## Introduction
 
+metatrader5rocket is a python package that provides interfaces to metatrader5(mt5).
+
+currently works with Python >= 3.6
+
 ## Feature
 
 At the momment, metatrader5rocket supports:
