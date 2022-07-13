@@ -1,9 +1,14 @@
 """
 @author: sluvie
 """
+import re
 import MetaTrader5 as mt5
 import pandas as pd
 import config as conf
+
+BUY = mt5.ORDER_TYPE_BUY
+SELL = mt5.ORDER_TYPE_SELL
+DEVIATION = 0
 
 class MT5(object):
 
@@ -41,7 +46,7 @@ class MT5(object):
 
 
     # get ohlc
-    def get_data(self, symbol, interval, days):
+    def tickers(self, symbol, interval, days):
         rates = []
 
         if interval == "m1":
@@ -80,3 +85,92 @@ class MT5(object):
         ohlc.drop(columns=['open', 'high', 'low', 'close'], inplace=True, axis=1)
 
         return (ohlc)
+
+
+    # get positions
+    def positions(self, symbol):
+        positions = mt5.positions_get(symbol=symbol)
+        if len(positions) == 0:
+            print("No open positions")
+        return (positions)
+
+
+    # orders
+    def orders(self, symbol, trend, lot, price=0):
+
+        if trend == BUY:
+            # check using real price or by order
+            price = mt5.symbol_info_tick(symbol).ask if price == 0 else price
+            request = {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "symbol": symbol,
+                "volume": lot,
+                "type": mt5.ORDER_TYPE_BUY,
+                "price": price,
+                "deviation": 0,
+                "magic": 0,
+                "comment": "script buy",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": mt5.ORDER_FILLING_IOC,
+            }
+            result = mt5.order_send(request)
+            print(result)
+
+        if trend == SELL:
+            # check using real price or by order
+            price = mt5.symbol_info_tick(symbol).bid if price == 0 else price
+            request = {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "symbol": symbol,
+                "volume": lot,
+                "type": mt5.ORDER_TYPE_SELL,
+                "price": price,
+                "deviation": 0,
+                "magic": 0,
+                "comment": "script sell",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": mt5.ORDER_FILLING_IOC,
+            }
+            result = mt5.order_send(request)
+            print(result)
+
+        print("")
+
+
+    # close position
+    def close_position(self, symbol, ticket, trend, lot):
+        if trend == BUY:
+            request= {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "symbol": symbol,
+                "volume": lot,
+                "type": mt5.ORDER_TYPE_SELL,
+                "position": ticket,
+                "price": mt5.symbol_info_tick(symbol).bid,
+                "deviation": DEVIATION,
+                "magic": 0,
+                "comment": "close buy",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": mt5.ORDER_FILLING_IOC,
+            }
+            result = mt5.order_send(request)
+            print(result)
+            print("")
+
+        if trend == SELL:
+            request= {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "symbol": symbol,
+                "volume": lot,
+                "type": mt5.ORDER_TYPE_BUY,
+                "position": ticket,
+                "price": mt5.symbol_info_tick(symbol).ask,
+                "deviation": DEVIATION,
+                "magic": 0,
+                "comment": "close sell",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": mt5.ORDER_FILLING_IOC,
+            }
+            result = mt5.order_send(request)
+            print(result)
+            print("")

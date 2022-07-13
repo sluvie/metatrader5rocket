@@ -6,6 +6,11 @@ if __name__ == '__main__':
     # clear screen
     os.system('cls||clear')
 
+    symbol = "XAUUSD"
+    interval = "m5"
+    days = 7
+    lot = 0.01
+
     engine = mt5.MT5()
     engine.start()
 
@@ -18,7 +23,31 @@ if __name__ == '__main__':
     print("")
 
     # get tickers
-    ohlc = engine.get_data("XAUUSD", "m5", 7)
+    ohlc = engine.tickers(symbol, interval, days)
     print(ohlc)
+    print("")
 
+    # try do order
+    # ?: example for order
+    # engine.orders(symbol, mt5.BUY, lot)
+    engine.orders(symbol, mt5.SELL, lot)
+
+
+    # get positions
+    positions = engine.positions(symbol)
+    print("")
+
+    # try to close, if profit
+    for position in positions:
+        print("Ticket           : {}".format(position.ticket))
+        print("Price (Open)     : {:.2f}".format(position.price_open))
+        print("Price (Current)  : {:.2f}".format(position.price_current))
+        print("Volume           : {:.2f}".format(position.volume))
+        print("Profit           : {:.2f}".format(position.profit))
+        print("")
+
+        if position.profit > 0:
+            engine.close_position(symbol, position.ticket, position.type, lot)
+
+    # shutdown
     engine.shutdown()
