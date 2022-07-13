@@ -10,6 +10,7 @@ if __name__ == '__main__':
     interval = "m5"
     days = 7
     lot = 0.01
+    profit = 0.2
 
     engine = mt5.MT5()
     engine.start()
@@ -30,8 +31,7 @@ if __name__ == '__main__':
     # try do order
     # ?: example for order
     # engine.orders(symbol, mt5.BUY, lot)
-    engine.orders(symbol, mt5.SELL, lot)
-
+    # engine.orders(symbol, mt5.SELL, lot)
 
     # get positions
     positions = engine.positions(symbol)
@@ -46,7 +46,7 @@ if __name__ == '__main__':
         print("Profit           : {:.2f}".format(position.profit))
         print("")
 
-        if position.profit > 0:
+        if position.profit > profit:
             engine.close_position(symbol, position.ticket, position.type, lot)
 
     # shutdown
